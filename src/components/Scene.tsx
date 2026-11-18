@@ -225,7 +225,7 @@ function overview(c: CameraControls, animate: boolean) {
   const wide = window.innerWidth >= 1024
   const narrow = window.innerWidth < 640
   const tx = wide ? -45 : 0
-  if (narrow) return c.setLookAt(0, 420, 330, 0, 0, 0, animate)
+  if (narrow) return c.setLookAt(0, 620, 330, 0, 0, 25, animate)
   return c.setLookAt(tx + 145, 215, 290, tx, 0, 20, animate)
 }
 
