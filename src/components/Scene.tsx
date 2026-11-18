@@ -226,7 +226,7 @@ function CameraRig({ fly, controls }: { fly: Props['fly']; controls: React.RefOb
     if (!c) return
     if (fly.id) {
       const p = PLOT_BY_ID[fly.id]
-      if (p) void c.setLookAt(p.x + 34, 42, p.z + 46, p.x, 0, p.z, true)
+      if (p) void c.setLookAt(p.x + 48, 62, p.z + 66, p.x, 0, p.z, true)
     } else if (fly.n > 0) {
       void c.setLookAt(100, 215, 290, -45, 0, 20, true)
     }

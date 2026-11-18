@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Building2, Clock, Copy, LayoutDashboard, Map, Radio, Wallet } from 'lucide-react'
-import { lazy, Suspense, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import Admin from './components/Admin'
 import Filters, { DEFAULT_FILTERS, filterActive, matchPlot, type FilterState } from './components/Filters'
 import MyBookings from './components/MyBookings'
@@ -43,6 +43,21 @@ function SyncPill() {
   )
 }
 
+function SceneLoader() {
+  return (
+    <div className="grid h-full place-items-center">
+      <div className="flex flex-col items-center gap-4">
+        <div className="grid grid-cols-4 gap-1.5">
+          {Array.from({ length: 16 }, (_, i) => (
+            <motion.div key={i} className="h-4 w-4 rounded-[4px] bg-emerald-400/70" animate={{ opacity: [0.15, 1, 0.15] }} transition={{ duration: 1.4, repeat: Infinity, delay: ((i % 4) + Math.floor(i / 4)) * 0.09 }} />
+          ))}
+        </div>
+        <div className="text-xs font-medium tracking-wide text-slate-400">Building the 3D site plan…</div>
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
   const s = useStore()
   const now = useNow(1000)
@@ -63,6 +78,14 @@ export default function App() {
   const matches = useMemo(() => (filterActive(filters) ? new Set(PLOTS.filter((p) => matchPlot(p, filters, statuses[p.id])).map((p) => p.id)) : null), [filters, statuses])
   const counts = useMemo(() => Object.values(statuses).reduce((a, x) => ({ ...a, [x]: (a[x] ?? 0) + 1 }), {} as Record<string, number>), [statuses])
   const myHold = s.myHold(now)
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { setSelected(null); setQuiz(false) }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   const pick = (id: string) => {
     setTab('explore')
@@ -111,7 +134,7 @@ export default function App() {
       <main className="relative flex-1 overflow-hidden">
         {/* 3D scene stays mounted so the camera is preserved between tabs */}
         <div className={`absolute inset-0 ${tab === 'explore' ? '' : 'invisible'}`}>
-          <Suspense fallback={<div className="grid h-full place-items-center text-sm text-slate-400">Loading 3D site plan…</div>}>
+          <Suspense fallback={<SceneLoader />}>
             <Scene statuses={statuses} matches={matches} selectedId={selected} hoverId={hover} onHover={setHover} onSelect={select} fly={fly} />
           </Suspense>
           <div className="pointer-events-none absolute inset-0 flex justify-between gap-4 p-4">
@@ -132,6 +155,9 @@ export default function App() {
             <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 animate-pulse rounded-sm bg-amber-400" /> Held <b data-testid="count-held">{counts.held ?? 0}</b></span>
             <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-rose-500" /> Booked <b data-testid="count-booked">{counts.booked ?? 0}</b></span>
           </div>
+          {!selected && (
+            <button onClick={() => setQuiz(true)} className="absolute bottom-16 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-emerald-400 px-4 py-2 text-xs font-bold text-emerald-950 shadow-lg md:hidden">Recommend me a plot</button>
+          )}
           {myHold && selected !== myHold.plotId && (
             <button onClick={() => pick(myHold.plotId)} className="pulse-ring absolute left-1/2 top-4 flex -translate-x-1/2 items-center gap-2 rounded-full bg-amber-300 px-4 py-2 text-xs font-bold text-amber-950">
               <Clock size={14} /> Holding {myHold.plotId} · {mmss((myHold.exp ?? 0) - now)} left · continue booking

@@ -20,16 +20,18 @@ export default function PlotPanel({ id, onClose, onPlans, onBookings }: { id: st
   const [kyc, setKyc] = useState({ name: ME.name, phone: '98XXXXXX10', pan: 'ABCDE1234F', agree: false })
   const [bookingId, setBookingId] = useState<string | null>(null)
   const [wasMine, setWasMine] = useState(false)
+  const [upi, setUpi] = useState('GPay')
 
   useEffect(() => { setStep('hold'); setErr(null); setBookingId(null); setWasMine(false) }, [id])
   useEffect(() => {
     if (mine) { setWasMine(true); if (step === 'hold') setStep('kyc') }
-    if (!mine && wasMine && step !== 'done') {
+    const iBookedIt = eff.status === 'booked' && eff.rec?.by === ME.id
+    if (!mine && wasMine && step !== 'done' && !iBookedIt) {
       setWasMine(false)
       setStep('hold')
-      setErr(eff.status === 'held' ? `Lost the race: ${eff.rec?.byName} holds this plot now (first writer wins).` : 'Your 10-minute hold expired, so the plot is back on sale.')
+      setErr(eff.status === 'held' ? `Lost the race: ${eff.rec?.byName} holds this plot now (first writer wins).` : 'Your hold expired, so the plot is back on sale.')
     }
-  }, [mine, wasMine, step, eff.status, eff.rec?.byName])
+  }, [mine, wasMine, step, eff.status, eff.rec?.byName, eff.rec?.by])
 
   const hold = async () => {
     setErr(null)
@@ -52,7 +54,7 @@ export default function PlotPanel({ id, onClose, onPlans, onBookings }: { id: st
   const stepIdx = steps.findIndex((x) => x.k === step)
 
   return (
-    <motion.div initial={{ x: 40, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 40, opacity: 0 }} className="glass flex max-h-full w-[360px] flex-col overflow-hidden rounded-2xl" data-testid="plot-panel">
+    <motion.div initial={{ x: 40, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 40, opacity: 0 }} className="glass flex max-h-full w-[calc(100vw-2rem)] flex-col sm:w-[360px] overflow-hidden rounded-2xl" data-testid="plot-panel">
       <div className="relative border-b border-white/5 p-4">
         <button onClick={onClose} className="absolute right-3 top-3 text-slate-400 hover:text-white"><X size={18} /></button>
         <div className="flex items-center gap-2">
@@ -148,10 +150,12 @@ export default function PlotPanel({ id, onClose, onPlans, onBookings }: { id: st
               <div className="text-[11px] text-slate-400">Mock UPI. No real payment, no gateway, no money moves.</div>
             </div>
             <div className="grid grid-cols-3 gap-1.5 text-center text-[11px]">
-              {['GPay', 'PhonePe', 'Paytm'].map((x) => <div key={x} className="rounded-lg bg-white/5 py-2 text-slate-300">{x}</div>)}
+              {['GPay', 'PhonePe', 'Paytm'].map((x) => (
+                <button key={x} type="button" onClick={() => setUpi(x)} className={`rounded-lg py-2 transition ${upi === x ? 'bg-emerald-400/15 text-emerald-200 ring-1 ring-emerald-300/50' : 'bg-white/5 text-slate-300 hover:bg-white/10'}`}>{x}</button>
+              ))}
             </div>
             <button disabled={busy} onClick={pay} data-testid="pay-btn" className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-300 to-emerald-300 py-3 text-sm font-bold text-slate-900 disabled:opacity-70">
-              {busy ? <><Loader2 size={16} className="animate-spin" /> Simulating payment…</> : 'Simulate ₹999 payment (DEMO)'}
+              {busy ? <><Loader2 size={16} className="animate-spin" /> Simulating {upi} payment…</> : `Simulate ₹999 via ${upi} (DEMO)`}
             </button>
           </div>
         )}

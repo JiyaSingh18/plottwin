@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy:pages": "bash scripts/deploy-pages.sh"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",
@@ -32,5 +33,6 @@
     "tailwindcss": "^4.3.5",
     "typescript": "~7.0.2",
     "vite": "^8.3.6"
-  }
+  },
+  "description": "Real-time 3D digital twin of a plotted development with live holds and bookings (demo)"
 }
