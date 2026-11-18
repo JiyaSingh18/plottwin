@@ -220,6 +220,15 @@ function Ring({ id, t0, color }: { id: string; t0: number; color: string }) {
   )
 }
 
+/** Overview framing: on wide screens shift the target left so the filter panel doesn't cover the site. */
+function overview(c: CameraControls, animate: boolean) {
+  const wide = window.innerWidth >= 1024
+  const narrow = window.innerWidth < 640
+  const tx = wide ? -45 : 0
+  if (narrow) return c.setLookAt(0, 420, 330, 0, 0, 0, animate)
+  return c.setLookAt(tx + 145, 215, 290, tx, 0, 20, animate)
+}
+
 function CameraRig({ fly, controls }: { fly: Props['fly']; controls: React.RefObject<CameraControls | null> }) {
   useEffect(() => {
     const c = controls.current
@@ -228,14 +237,14 @@ function CameraRig({ fly, controls }: { fly: Props['fly']; controls: React.RefOb
       const p = PLOT_BY_ID[fly.id]
       if (p) void c.setLookAt(p.x + 48, 62, p.z + 66, p.x, 0, p.z, true)
     } else if (fly.n > 0) {
-      void c.setLookAt(100, 215, 290, -45, 0, 20, true)
+      void overview(c, true)
     }
   }, [fly, controls])
   useEffect(() => {
     const c = controls.current
     if (!c) return
     c.setLookAt(-50, 560, 460, -50, 0, 15, false)
-    const t = setTimeout(() => void c.setLookAt(100, 215, 290, -45, 0, 20, true), 250)
+    const t = setTimeout(() => void overview(c, true), 250)
     return () => clearTimeout(t)
   }, [controls])
   return null

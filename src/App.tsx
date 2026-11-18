@@ -111,7 +111,7 @@ export default function App() {
           <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 text-lg font-black text-emerald-950 shadow-[0_0_30px_-6px_rgba(52,211,153,.7)]">P</div>
           <div className="leading-tight">
             <div className="text-sm font-bold tracking-tight">Plot<span className="text-emerald-300">Twin</span></div>
-            <div className="text-[10px] text-slate-400">{PROJECT.name} · <span className="text-amber-200">demo project</span></div>
+            <div className="whitespace-nowrap text-[10px] text-slate-400">{PROJECT.name} · <span className="text-amber-200">demo project</span></div>
           </div>
         </div>
         <nav className="ml-4 hidden items-center gap-1 md:flex">
@@ -124,7 +124,7 @@ export default function App() {
         <div className="ml-auto flex items-center gap-2">
           <SyncPill />
           <button onClick={() => window.open(location.href, '_blank', 'popup,width=1280,height=820')} className="hidden items-center gap-1.5 rounded-full bg-emerald-400/15 px-3 py-1.5 text-[11px] font-semibold text-emerald-200 ring-1 ring-emerald-300/30 hover:bg-emerald-400/25 lg:flex"><Copy size={12} /> Open 2nd window</button>
-          <div className="rounded-full bg-white/5 px-3 py-1.5 text-[11px] text-slate-300 ring-1 ring-white/10" title="Each window is a separate demo buyer" data-testid="me">{ME.name}</div>
+          <div className="hidden whitespace-nowrap rounded-full bg-white/5 px-3 py-1.5 text-[11px] text-slate-300 ring-1 ring-white/10 sm:block" title="Each window is a separate demo buyer" data-testid="me">{ME.name}</div>
         </div>
       </header>
       <nav className="flex justify-around border-b border-white/5 bg-[#08130f] py-1 md:hidden">
