@@ -11,6 +11,6 @@ cd dist
 rm -rf .git
 git init -q -b gh-pages
 git add -A
-git commit -qm "Deploy PlotTwin $(date -u +%Y-%m-%dT%H:%MZ)"
+git -c user.name="$(git -C .. config user.name)" -c user.email="$(git -C .. config user.email)" commit -qm "Deploy PlotTwin $(date -u +%Y-%m-%dT%H:%MZ)"
 git push -qf "$(git -C .. remote get-url origin)" gh-pages
 echo "Pushed to gh-pages"
